@@ -1,19 +1,19 @@
 package com.loucaskreger.mcscript;
 
-import com.loucaskreger.mcscript.util.Script;
+import com.loucaskreger.mcscript.lua.LuaExecutor;
 import com.loucaskreger.mcscript.util.ScriptManager;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.luaj.vm2.LuaThread;
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.JsePlatform;
 
-import java.lang.reflect.Method;
+import java.io.File;
 
 @Mod("mcscript")
 public class McScript {
@@ -31,18 +31,21 @@ public class McScript {
     }
 
     private void setupClient(final FMLClientSetupEvent event) {
-        Method getThread = ObfuscationReflectionHelper.findMethod(Minecraft.class, "func_213170_ax"); // getRunningThread
-        try {
-            Thread thread = (Thread) getThread.invoke(Minecraft.getInstance());
-            ScriptManager.init();
+//        McScript.LOGGER.info("Setup Client Thread: " + Thread.currentThread());
+//        LuaExecutor.getInstance().submit(() -> {
+////        McScript.LOGGER.info("RUNNING SUBMITTED");
+////        EventHandler.getInstance().clearLocks();
+//            ScriptManager manager = ScriptManager.getInstance();
+//            Globals globals = JsePlatform.standardGlobals();
+//
+//            manager.loadScripts();
+//            McScript.LOGGER.info(manager.files.size());
+//            for (File file : manager.files) {
+//                McScript.LOGGER.info("Inside Files Loop");
+//                LuaValue chunk = globals.loadfile(file.getPath());
+//                chunk.call("com/loucaskreger/mcscript/libs/");
+//            }
+//        });
 
-            LOGGER.info("SetupClient");
-            ScriptManager.INSTANCE.loadScripts();
-            for (Script script : ScriptManager.INSTANCE.scripts) {
-                script.call();
-            }
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
     }
 }

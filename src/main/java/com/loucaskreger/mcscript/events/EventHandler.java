@@ -1,45 +1,112 @@
 package com.loucaskreger.mcscript.events;
 
 import com.loucaskreger.mcscript.McScript;
-import org.luaj.vm2.LuaClosure;
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class EventHandler {
 
+    private static volatile EventHandler instance;
+
+    private Map<EventType, LuaFunction> listeners;
+    private Map<EventType, ReentrantLock> locks;
+
     public static EventHandler getInstance() {
-        if (INSTANCE == null) {
-            McScript.LOGGER.info("INIT HERE");
-            INSTANCE = new EventHandler();
+        if (instance == null) {
+            synchronized (EventHandler.class) {
+                if (instance == null) {
+                    instance = new EventHandler();
+                }
+            }
         }
-        return INSTANCE;
+        return instance;
     }
 
-    private EventHandler() {
-        this.callbacks = new HashMap<>();
+    EventHandler() {
+        McScript.LOGGER.info("INITIALIZED ANOTHER EVENT HANDLER");
+        if (listeners == null) {
+            McScript.LOGGER.info("Listeners is null");
+            listeners = new HashMap<>();
+        }
+        if (locks == null) {
+            McScript.LOGGER.info("Locks is null");
+            locks = new HashMap<>();
+        }
     }
 
-    public void addEventCallback(EventType type, LuaClosure callback) {
-        McScript.LOGGER.info("Is Null: ");
-        McScript.LOGGER.info(callback == null);
-        McScript.LOGGER.info("Added event to Type: " + type + " Callback: " + callback.tojstring());
-        callbacks.put(type, callback);
-        McScript.LOGGER.info(callbacks.containsKey(type));
-        McScript.LOGGER.info(EventType.CLIENT_TICK == type);
-        McScript.LOGGER.info(callbacks.size());
+    public void addEventListener(EventType type, LuaFunction listener) {
+        McScript.LOGGER.info("addEventListener Thread: " + Thread.currentThread());
+        McScript.LOGGER.info("addEventListener");
+        listeners.put(type, listener);
+        locks.put(type, new ReentrantLock());
+        McScript.LOGGER.info("Listeners: " + listeners.containsKey(type));
+        McScript.LOGGER.info("Locks: " + locks.containsKey(type));
+        McScript.LOGGER.info("----------------------");
+        this.getEventListener(type);
     }
 
-    public LuaFunction getEventCallback(EventType type) {
-        McScript.LOGGER.info(callbacks.size());
-        McScript.LOGGER.info(EventType.CLIENT_TICK == type);
-        McScript.LOGGER.info("Trying to get event of type: " + type);
-        McScript.LOGGER.info(callbacks.containsKey(type));
-        return callbacks.get(type);
+    public Optional<LuaFunction> getEventListener(EventType type) {
+        McScript.LOGGER.info("getEventListener Thread: " + Thread.currentThread());
+        McScript.LOGGER.info("getEventListener");
+        McScript.LOGGER.info("Listeners: " + listeners.containsKey(type));
+        McScript.LOGGER.info("Locks: " + locks.containsKey(type));
+        return Optional.of(listeners.get(type));
     }
 
+    public void clearLocks() {
+        locks.clear();
+    }
 
-    private final Map<EventType, LuaClosure> callbacks;
-    private static EventHandler INSTANCE;
+    public boolean dispatchEvents(EventType type, Object event) {
+        McScript.LOGGER.info("HERE");
+        Optional<LuaFunction> func = getEventListener(type);
+        McScript.LOGGER.info(func.isPresent());
+        if (func.isPresent()) {
+            McScript.LOGGER.info("Function is present");
+            try {
+                ReentrantLock lock = locks.get(type);
+                if (lock.tryLock()) {
+                    McScript.LOGGER.info("Inside Lock");
+                    try {
+                        McScript.LOGGER.info("Want to be here");
+                        func.get().call(CoerceJavaToLua.coerce(event));
+                    } finally {
+                        lock.unlock();
+                    }
+                }
+            } catch (LuaError e) {
+                McScript.LOGGER.error("Lua error: " + e.getMessage().toString());
+                this.clearLocks();
+                return false;
+            }
+            return true;
+        }
+        McScript.LOGGER.info("Function is not Present");
+        McScript.LOGGER.info(locks.size());
+        McScript.LOGGER.info(listeners.size());
+        return false;
+    }
+
+    public void debug() {
+        McScript.LOGGER.info("listeners: " + listeners.size());
+        McScript.LOGGER.info("locks: " + locks.size());
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        try {
+            McScript.LOGGER.info("GC'd EventHandler object");
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            McScript.LOGGER.info("GC'd Super object");
+            super.finalize();
+        }
+    }
 }
