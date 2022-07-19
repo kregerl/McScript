@@ -13,6 +13,7 @@ import java.util.Map;
 
 public class ScriptManager {
 
+    // TODO: Make this point to .minecraft/lua/scripts
     private static final Path SCRIPT_PATH = FMLPaths.GAMEDIR.get().resolve("scripts");
     private static final String LIB_PATH = "com/loucaskreger/mcscript/libs/";
     private static ScriptManager instance;

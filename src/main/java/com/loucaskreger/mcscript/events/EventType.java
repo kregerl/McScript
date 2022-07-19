@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public enum EventType {
-    CLIENT_TICK("CLIENT_TICK");
+    CLIENT_TICK("CLIENT_TICK"),
+    CHAT_MSG_RECEIVED("CHAT_MSG_RECEIVED");
 
     final String eventName;
 

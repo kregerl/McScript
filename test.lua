@@ -1,11 +1,19 @@
 libs = ...
-local events = require(libs.."events")
 
-print('events', events)
+print('EventHandler', EventHandler)
 
 function test (event)
-    print("Hello World!")
-    print(event)
+    print('phase', event.phase)
+    print('side', event.side)
+    print('type', event.type)
 end
 
-print("Value of: ", events.register("CLIENT_TICK", test))
+function chatMsg(event)
+
+    print("Chat message in lua:", event.getMessage())
+end
+
+local ctresult = EventHandler.addEventListener(EventType.CLIENT_TICK, test)
+print('Client Tick Result:', ctresult)
+local cmresult = EventHandler.addEventListener(EventType.CHAT_MSG_RECEIVED, chatMsg)
+print('Chat Message Result:', cmresult)
