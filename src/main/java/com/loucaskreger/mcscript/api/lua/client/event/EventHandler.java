@@ -1,14 +1,12 @@
-package com.loucaskreger.mcscript.api.lua;
+package com.loucaskreger.mcscript.api.lua.client.event;
 
 import com.loucaskreger.mcscript.McScript;
-import com.loucaskreger.mcscript.events.EventType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.LibFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 
 import java.util.HashMap;

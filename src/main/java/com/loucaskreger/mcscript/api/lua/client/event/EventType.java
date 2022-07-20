@@ -1,4 +1,4 @@
-package com.loucaskreger.mcscript.events;
+package com.loucaskreger.mcscript.api.lua.client.event;
 
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
