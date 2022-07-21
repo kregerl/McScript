@@ -1,39 +1,23 @@
 package com.loucaskreger.mcscript.api.lua.client.event;
 
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 public enum EventType {
-    CLIENT_TICK("CLIENT_TICK"),
-    CHAT_MSG_RECEIVED("CHAT_MSG_RECEIVED");
-
-    final String eventName;
-
-    EventType(String eventName) {
-        this.eventName = eventName;
-    }
-
-    public String getEventName() {
-        return this.eventName;
-    }
-
-    public static LuaTable getTable() {
-        List<LuaValue> values = new ArrayList<>();
-        for (EventType type : EventType.values()) {
-            // Lua tables are created in the order {key1, value1, key2, value2}
-            LuaValue value = LuaValue.valueOf(type.getEventName());
-            values.add(value);
-            values.add(value);
-        }
-        return LuaTable.tableOf(values.toArray(new LuaValue[0]));
-    }
+    CLIENT_TICK,
+    CHAT_MSG_SENT,
+    CHAT_MSG_RECEIVED,
+    DIFFICULTY_CHANGED,// Maybe server side?
+    LOGGED_IN,
+    LOGGED_OUT,
+    RESPAWNED,
+    CLICK_INPUT,
+    MOUSE_INPUT,
+    MOUSE_SCROLLED,
+    KEYBOARD_INPUT,
+    RAW_MOUSE_EVENT;
 
     public static Optional<EventType> eventFromName(String name) {
-        return Arrays.stream(EventType.values()).filter(et -> et.getEventName().equals(name)).findFirst();
+        return Arrays.stream(EventType.values()).filter(et -> et.name().equals(name)).findFirst();
     }
 }
