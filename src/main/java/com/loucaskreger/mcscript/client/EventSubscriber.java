@@ -9,6 +9,7 @@ import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.event.DifficultyChangeEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -77,11 +78,11 @@ public class EventSubscriber {
 
     // TODO: Add render events and hud API
 
-//    @SubscribeEvent
-//    public static void onDifficultyChanged(final DifficultyChangeEvent event) {
-//        McScript.LOGGER.info("Difficulty Changed" + event.getDifficulty());
-//        EventHandler.getListener(EventType.DIFFICULTY_CHANGED).ifPresent(listener -> listener.call(CoerceJavaToLua.coerce(event)));
-//    }
+    @SubscribeEvent
+    public static void onDifficultyChanged(final DifficultyChangeEvent event) {
+        McScript.LOGGER.info("Difficulty Changed" + event.getDifficulty());
+        EventHandler.getListener(EventType.DIFFICULTY_CHANGED).ifPresent(listener -> listener.call(CoerceJavaToLua.coerce(event)));
+    }
 
 
 }

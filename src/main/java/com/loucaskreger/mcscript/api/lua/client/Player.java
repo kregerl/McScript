@@ -1,10 +1,12 @@
 package com.loucaskreger.mcscript.api.lua.client;
 
+import com.loucaskreger.mcscript.McScript;
 import com.loucaskreger.mcscript.util.LuaUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.HandSide;
+import net.minecraft.util.math.vector.Vector3d;
 import org.luaj.vm2.LuaBoolean;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
@@ -17,8 +19,11 @@ import java.util.function.Function;
 @SuppressWarnings("unchecked")
 public class Player extends LuaTable {
 
+    private Vector3d prevPos;
+
     public Player() {
         super();
+        this.prevPos = Vector3d.ZERO;
         // Enums
         this.set("Hand", LuaUtils.tableFromEnum(Hand.class));
         this.set("HandSide", LuaUtils.tableFromEnum(HandSide.class));
@@ -69,11 +74,24 @@ public class Player extends LuaTable {
         this.set("isSwimming", new PlayerValueGetter("isSwimming", player -> valueOf(player.isSwimming())));
         this.set("isUnderWater", new PlayerValueGetter("isUnderWater", player -> valueOf(player.isUnderWater())));
         this.set("isUsingItem", new PlayerValueGetter("isUsingItem", player -> valueOf(player.isUsingItem())));
+        this.set("isWalking", new PlayerValueGetter("isWalking", this::isWalking));
         this.set("shouldShowDeathScreen", new PlayerValueGetter("shouldShowDeathScreen", player -> valueOf(player.shouldShowDeathScreen())));
         this.set("takeXpDelay", new PlayerValueGetter("takeXpDelay", player -> valueOf(player.takeXpDelay)));
         this.set("getAbsorptionAmount", new PlayerValueGetter("getAbsorptionAmount", player -> valueOf(player.getAbsorptionAmount())));
 
         this.set("getInventory", new PlayerValueGetter("getInventory", PlayerInventory::new));
+    }
+
+    private LuaBoolean isWalking(ClientPlayerEntity player) {
+        Vector3d tmp = player.getPosition(0);
+        if (tmp.equals(this.prevPos) || !player.isOnGround()) {
+            return FALSE;
+        }
+        this.prevPos = tmp;
+        LuaBoolean result = valueOf(player.isOnGround());
+        McScript.LOGGER.info(result);
+        return result;
+
     }
 
     private void setSetters() {
@@ -124,6 +142,7 @@ public class Player extends LuaTable {
         }
     }
 
+    // TODO: Could remove returning NIL when player is nil since the user should check if the player is nil in the first place.
     private static class PlayerValueGetter extends LuaUtils.LuaGetter<ClientPlayerEntity> {
 
         public PlayerValueGetter(String name, Function<ClientPlayerEntity, LuaValue> getter) {

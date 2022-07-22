@@ -5,22 +5,23 @@ logger.info("this is a test")
 print('EventHandler', EventHandler)
 print('Client', Player)
 
+function printTable(table)
+    for k, v in pairs(table) do
+        print("Key:", k, "Value:", v)
+    end
+end
+
 for k, v in pairs(Player) do
     print("Key:", k, "Value:", v)
 end
 
 function test (event)
     if not Player.isNil() then
-        Player.setSprinting(true)
---         print('Player exp:', Player.getExperience())
-        if Player.isUsingItem() then
-            print('Player using item:', Player.isUsingItem())
-        end
+        printTable(Player.getInventory().getArmor)
+        printTable(Player.getInventory().getItems)
+        printTable(Player.getInventory().getOffhand)
+        print(Player.getInventory().selectedHotbarIndex)
     end
-
---     print('phase', event.phase)
---     print('side', event.side)
---     print('type', event.type)
 end
 
 function chatMsg(event)
