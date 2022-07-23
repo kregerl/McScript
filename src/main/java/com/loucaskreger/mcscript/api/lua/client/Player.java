@@ -84,13 +84,13 @@ public class Player extends LuaTable {
 
     private LuaBoolean isWalking(ClientPlayerEntity player) {
         Vector3d tmp = player.getPosition(0);
-        if (tmp.equals(this.prevPos) || !player.isOnGround()) {
+        McScript.LOGGER.info("Distance to: " + tmp.distanceTo(this.prevPos));
+        if (tmp.distanceTo(this.prevPos) < 0.1D || !player.isOnGround()) {
+            this.prevPos = tmp;
             return FALSE;
         }
         this.prevPos = tmp;
-        LuaBoolean result = valueOf(player.isOnGround());
-        McScript.LOGGER.info(result);
-        return result;
+        return valueOf(player.isOnGround());
 
     }
 
@@ -153,6 +153,7 @@ public class Player extends LuaTable {
         public LuaValue call() {
             Optional<ClientPlayerEntity> player = Optional.ofNullable(Minecraft.getInstance().player);
             if (!player.isPresent()) {
+                // TODO: Maybe throw error here since this should be called after a nil check.
                 return NIL;
             }
             return this.getter.apply(player.get());

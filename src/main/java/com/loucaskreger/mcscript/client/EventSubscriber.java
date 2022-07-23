@@ -25,7 +25,10 @@ public class EventSubscriber {
 
     @SubscribeEvent
     public static void onClientTick(final TickEvent.ClientTickEvent event) {
+        // TODO: Convert events to a lua table so things like phase can be used by lua
+//        if (event.phase == TickEvent.Phase.START) {
         EventHandler.getListener(EventType.CLIENT_TICK).ifPresent(listener -> listener.call(CoerceJavaToLua.coerce(event)));
+//        }
     }
 
     @SubscribeEvent

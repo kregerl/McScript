@@ -4,14 +4,16 @@ import com.loucaskreger.mcscript.api.lua.client.Player;
 import com.loucaskreger.mcscript.api.lua.client.event.EventHandler;
 import com.loucaskreger.mcscript.api.lua.client.event.EventType;
 import com.loucaskreger.mcscript.util.LuaUtils;
-import com.loucaskreger.mcscript.util.ScriptManager;
+import com.loucaskreger.mcscript.util.ModuleManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.luaj.vm2.LuaError;
 
 @Mod("mcscript")
 public class McScript {
@@ -30,11 +32,13 @@ public class McScript {
     }
 
     private void setupClient(final FMLClientSetupEvent event) {
-        ScriptManager manager = ScriptManager.getInstance();
+        ModuleManager manager = ModuleManager.getInstance();
         manager.loadScripts();
+        manager.setGlobalsEntry("EventHandler", script -> new EventHandler(script.getName()));
         manager.setGlobalsEntry("EventType", LuaUtils.tableFromEnum(EventType.class));
-        manager.setGlobalsEntry("EventHandler", new EventHandler());
+        manager.setGlobalsEntry("Phase", LuaUtils.tableFromEnum(TickEvent.Phase.class));
         manager.setGlobalsEntry("Player", new Player());
         manager.callAll();
+
     }
 }

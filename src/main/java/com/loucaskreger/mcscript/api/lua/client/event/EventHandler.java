@@ -14,10 +14,13 @@ public class EventHandler extends LuaTable {
 
     // TODO: Make this logger point to a different file, maybe .minecraft/lua/logs
     private static final Logger LOGGER = LogManager.getLogger("test");
+    // TODO: event listeners should also be split by script, make another map holding a str of the script name
     public static Map<EventType, LuaFunction> listeners;
+    private String moduleName;
 
-    public EventHandler() {
+    public EventHandler(String moduleName) {
         super();
+        this.moduleName = moduleName;
         listeners = new HashMap<>();
         this.set("addEventListener", new addEventListener());
 
@@ -38,10 +41,11 @@ public class EventHandler extends LuaTable {
         return Optional.ofNullable(listeners.get(key));
     }
 
-    static class addEventListener extends TwoArgFunction {
+    class addEventListener extends TwoArgFunction {
 
         @Override
         public LuaValue call(LuaValue name, LuaValue listener) {
+            McScript.LOGGER.info("Module name: " + EventHandler.this.moduleName);
             if (!(name instanceof LuaString)) {
                 throw new LuaError("The first argument is not a string! Expected an event type");
             }
@@ -58,5 +62,4 @@ public class EventHandler extends LuaTable {
             return LuaValue.NIL;
         }
     }
-
 }
