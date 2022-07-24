@@ -1,6 +1,5 @@
 package com.loucaskreger.mcscript.api.lua.client;
 
-import com.loucaskreger.mcscript.McScript;
 import com.loucaskreger.mcscript.util.LuaUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
@@ -8,6 +7,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.math.vector.Vector3d;
 import org.luaj.vm2.LuaBoolean;
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
@@ -82,9 +82,11 @@ public class Player extends LuaTable {
         this.set("getInventory", new PlayerValueGetter("getInventory", PlayerInventory::new));
     }
 
+
+    // TODO: Fix the bouncing after stopping sprinting.
     private LuaBoolean isWalking(ClientPlayerEntity player) {
         Vector3d tmp = player.getPosition(0);
-        McScript.LOGGER.info("Distance to: " + tmp.distanceTo(this.prevPos));
+//        McScript.LOGGER.info("Distance to: " + tmp.distanceTo(this.prevPos));
         if (tmp.distanceTo(this.prevPos) < 0.1D || !player.isOnGround()) {
             this.prevPos = tmp;
             return FALSE;
@@ -153,8 +155,9 @@ public class Player extends LuaTable {
         public LuaValue call() {
             Optional<ClientPlayerEntity> player = Optional.ofNullable(Minecraft.getInstance().player);
             if (!player.isPresent()) {
+                throw new LuaError("Attempted to access player before it exists.");
                 // TODO: Maybe throw error here since this should be called after a nil check.
-                return NIL;
+//                return NIL;
             }
             return this.getter.apply(player.get());
         }

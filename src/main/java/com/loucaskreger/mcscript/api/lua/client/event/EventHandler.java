@@ -1,10 +1,12 @@
 package com.loucaskreger.mcscript.api.lua.client.event;
 
 import com.loucaskreger.mcscript.McScript;
+import net.minecraftforge.eventbus.api.Event;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.luaj.vm2.*;
 import org.luaj.vm2.lib.TwoArgFunction;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,8 +39,17 @@ public class EventHandler extends LuaTable {
 //        }
     }
 
-    public static Optional<LuaFunction> getListener(EventType key) {
+    private static Optional<LuaFunction> getListener(EventType key) {
         return Optional.ofNullable(listeners.get(key));
+    }
+
+    public static void dispatch(EventType key, Event event) {
+        Optional<LuaFunction> callback = getListener(key);
+        try {
+            callback.ifPresent(listener -> listener.call(CoerceJavaToLua.coerce(event)));
+        } catch (LuaError e) {
+            McScript.LUA_LOGGER.error("Error dispatching event");
+        }
     }
 
     class addEventListener extends TwoArgFunction {

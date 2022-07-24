@@ -72,4 +72,8 @@ public class ModuleManager {
         }
         McScript.LOGGER.info(String.format("Loaded %d modules", this.modules.size()));
     }
+
+    public Map<String, LuaModule> getModules() {
+        return this.modules;
+    }
 }

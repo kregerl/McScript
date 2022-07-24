@@ -9,14 +9,16 @@ import java.io.File;
 public class LuaModule {
 
     private final Globals globals;
-    private final LuaValue chunk;
+    private final String path;
     private final String name;
+    private LuaValue chunk;
     private boolean error;
 
     public LuaModule(File file) {
         this.globals = JsePlatform.standardGlobals();
-        this.chunk = this.globals.loadfile(file.getPath());
+        this.path = file.getPath();
         this.name = file.getName();
+        this.chunk = this.globals.loadfile(this.path);
     }
 
     public String getName() {
@@ -37,6 +39,12 @@ public class LuaModule {
 
     public boolean isError() {
         return this.error;
+    }
+
+    public void reloadModule() {
+        this.chunk = this.globals.loadfile(this.path);
+        this.error = false;
+        this.call();
     }
 
 }
