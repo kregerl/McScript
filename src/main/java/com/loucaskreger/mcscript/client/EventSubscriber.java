@@ -5,6 +5,7 @@ import com.loucaskreger.mcscript.api.lua.client.event.EventHandler;
 import com.loucaskreger.mcscript.api.lua.client.event.EventType;
 import com.loucaskreger.mcscript.client.screen.widget.OpenModuleScreenButton;
 import net.minecraft.client.gui.screen.IngameMenuScreen;
+import net.minecraft.client.gui.screen.OptionsScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.api.distmarker.Dist;
@@ -90,7 +91,7 @@ public class EventSubscriber {
     @SubscribeEvent
     public static void onScreenInit(final GuiScreenEvent.InitGuiEvent.Post event) {
         Screen screen = event.getGui();
-        if (screen instanceof IngameMenuScreen) {
+        if (screen instanceof IngameMenuScreen || screen instanceof OptionsScreen) {
             event.addWidget(new OpenModuleScreenButton(screen));
         }
     }
