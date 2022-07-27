@@ -7,6 +7,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.WorldSelectionList;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
@@ -122,7 +123,8 @@ public class ModuleScreen extends Screen {
             @Override
             public void render(@Nonnull MatrixStack matrixStack, int entryIndex, int yPos, int xPos, int p_230432_5_, int mouseX, int mouseY, int p_230432_8_, boolean p_230432_9_, float partialTicks) {
                 this.mc.getTextureManager().bind(new ResourceLocation("textures/gui/world_selection.png"));
-                AbstractGui.fill(matrixStack, xPos, yPos, xPos + 32, yPos + 32, -1601138544);
+                // Light grey square
+//                AbstractGui.fill(matrixStack, xPos, yPos, xPos + 32, yPos + 32, -1601138544);
                 drawString(matrixStack, ModuleScreen.this.font, this.module.getDisplayName(), xPos, yPos, 16777215);
                 matrixStack.pushPose();
                 final float FONT_SCALE_FACTOR = 0.5f;
