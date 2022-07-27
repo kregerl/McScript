@@ -1,5 +1,5 @@
 libs = ...
-local logger = require("com.loucaskreger.mcscript.api.lua.client.Logger")
+local logger = require("com.loucaskreger.mcscript.api.lua.client.LuaLogger")
 
 logger.info("this is a test")
 print('EventHandler', EventHandler)

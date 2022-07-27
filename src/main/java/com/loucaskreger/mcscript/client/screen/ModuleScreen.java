@@ -13,12 +13,10 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Map;
 
 @SuppressWarnings("deprecation")
 public class ModuleScreen extends Screen {
@@ -67,8 +65,8 @@ public class ModuleScreen extends Screen {
             this.setRenderTopAndBottom(false);
             this.setRenderHeader(true, this.y0);
 
-            for (Map.Entry<String, LuaModule> entry : ModuleManager.getInstance().getModules().entrySet()) {
-                this.addEntry(new Entry(this.minecraft, entry));
+            for (LuaModule module : ModuleManager.getInstance().getModules().values()) {
+                this.addEntry(new Entry(this.minecraft, module));
             }
         }
 
@@ -114,25 +112,34 @@ public class ModuleScreen extends Screen {
         class Entry extends ExtendedList.AbstractListEntry<ModuleScreen.ModuleScreenList.Entry> {
 
             private final Minecraft mc;
-            private final ITextComponent name;
+            private final LuaModule module;
 
-            private Entry(Minecraft mc, Map.Entry<String, LuaModule> entry) {
+            private Entry(Minecraft mc, LuaModule module) {
                 this.mc = mc;
-                this.name = new StringTextComponent(entry.getKey());
+                this.module = module;
             }
 
             @Override
             public void render(@Nonnull MatrixStack matrixStack, int entryIndex, int yPos, int xPos, int p_230432_5_, int mouseX, int mouseY, int p_230432_8_, boolean p_230432_9_, float partialTicks) {
                 this.mc.getTextureManager().bind(new ResourceLocation("textures/gui/world_selection.png"));
                 AbstractGui.fill(matrixStack, xPos, yPos, xPos + 32, yPos + 32, -1601138544);
-                drawString(matrixStack, ModuleScreen.this.font, name, xPos, yPos, 16777215);
+                drawString(matrixStack, ModuleScreen.this.font, this.module.getDisplayName(), xPos, yPos, 16777215);
+                matrixStack.pushPose();
+                final float FONT_SCALE_FACTOR = 0.5f;
+                matrixStack.scale(FONT_SCALE_FACTOR, FONT_SCALE_FACTOR, 0.f);
+                final float INVERSE_FONT_SCALE_FACTOR = 1 / FONT_SCALE_FACTOR;
+                final int AUTHOR_OFFSET = 10;
+                drawString(matrixStack, ModuleScreen.this.font, String.format("By: %s", this.module.getAuthor()), (int) (INVERSE_FONT_SCALE_FACTOR * xPos), (int) (INVERSE_FONT_SCALE_FACTOR * (yPos + AUTHOR_OFFSET)), 8421504);
+                final int VERSION_OFFSET = AUTHOR_OFFSET + 6;
+                drawString(matrixStack, ModuleScreen.this.font, String.format("Version: %s", this.module.getVersion()), (int) (INVERSE_FONT_SCALE_FACTOR * xPos), (int) (INVERSE_FONT_SCALE_FACTOR * (yPos + VERSION_OFFSET)), 8421504);
+                matrixStack.popPose();
             }
 
             @Override
-            public void mouseMoved(double mouseX, double mouseY) {
-                McScript.LOGGER.info(String.format("(%d, %d)", mouseX, mouseY));
+            public boolean mouseClicked(double p_231044_1_, double p_231044_3_, int p_231044_5_) {
+                ModuleScreen.ModuleScreenList.this.setSelected(this);
+                return true;
             }
-
         }
     }
 

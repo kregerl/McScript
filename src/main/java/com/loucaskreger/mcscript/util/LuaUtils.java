@@ -8,9 +8,12 @@ import org.luaj.vm2.lib.ZeroArgFunction;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
+@SuppressWarnings("unchecked")
 public class LuaUtils {
 
     // Lua tables are created in the order {key1, value1, key2, value2}
@@ -22,6 +25,14 @@ public class LuaUtils {
             values.add(value);
         }
         return LuaTable.tableOf(values.toArray(new LuaValue[0]));
+    }
+
+    public static <T> Optional<T> tryConvert(LuaValue arg) {
+        try {
+            return Optional.of((T) arg);
+        } catch (ClassCastException e) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -48,8 +59,8 @@ public class LuaUtils {
     /**
      * The Setter base class for exposing Java functions to Lua.
      *
-     * @param <T> The type T that
-     * @param <S>
+     * @param <T> The type T that is provides to the function caller
+     * @param <S> The type S that is provides to the function caller
      */
     public static abstract class LuaSetter<T, S> extends OneArgFunction {
         protected final BiConsumer<T, S> setter;
@@ -58,6 +69,14 @@ public class LuaUtils {
         public LuaSetter(String name, BiConsumer<T, S> setter) {
             this.name = name;
             this.setter = setter;
+        }
+    }
+
+    public static abstract class LuaConsumer<T extends LuaValue> extends OneArgFunction {
+        protected Consumer<T> consumer;
+
+        public LuaConsumer(Consumer<T> consumer) {
+            this.consumer = consumer;
         }
     }
 }

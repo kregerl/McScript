@@ -1,5 +1,6 @@
 package com.loucaskreger.mcscript.util;
 
+import com.loucaskreger.mcscript.McScript;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
@@ -11,8 +12,13 @@ public class LuaModule {
     private final Globals globals;
     private final String path;
     private final String name;
+    private String displayName;
+    private String description;
+    private String author;
+    private String version;
     private LuaValue chunk;
     private boolean error;
+
 
     public LuaModule(File file) {
         this.globals = JsePlatform.standardGlobals();
@@ -30,6 +36,10 @@ public class LuaModule {
     }
 
     public void call() {
+        McScript.LOGGER.info(this.getDisplayName());
+        McScript.LOGGER.info(this.getAuthor());
+        McScript.LOGGER.info(this.getDescription());
+        McScript.LOGGER.info(this.getVersion());
         this.chunk.call();
     }
 
@@ -47,4 +57,35 @@ public class LuaModule {
         this.call();
     }
 
+    public String getDisplayName() {
+        return displayName == null ? this.name : this.displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getAuthor() {
+        return this.author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getVersion() {
+        return this.version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
 }

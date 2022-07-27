@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-@SuppressWarnings("unchecked")
 public class Player extends LuaTable {
 
     private Vector3d prevPos;
@@ -113,7 +112,6 @@ public class Player extends LuaTable {
         }
     }
 
-    // TODO: See if its possible to make this use java types for generic instead of LuaValues like LuaBoolean.
     private static class PlayerValueSetter<T> extends LuaUtils.LuaSetter<ClientPlayerEntity, T> {
 
         public PlayerValueSetter(String name, BiConsumer<ClientPlayerEntity, T> setter) {
@@ -126,7 +124,7 @@ public class Player extends LuaTable {
             if (!player.isPresent()) {
                 return FALSE;
             }
-            Optional<T> param = Optional.ofNullable(this.convert(arg));
+            Optional<T> param = LuaUtils.tryConvert(arg);
             if (!param.isPresent()) {
                 return FALSE;
             }
@@ -135,13 +133,6 @@ public class Player extends LuaTable {
         }
 
         // Yikes
-        private T convert(LuaValue arg) {
-            try {
-                return (T) arg;
-            } catch (ClassCastException e) {
-                return null;
-            }
-        }
     }
 
     // TODO: Could remove returning NIL when player is nil since the user should check if the player is nil in the first place.
