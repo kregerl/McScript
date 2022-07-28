@@ -1,4 +1,3 @@
-libs = ...
 local logger = require("com.loucaskreger.mcscript.api.lua.client.LuaLogger")
 
 logger.info("this is a test")

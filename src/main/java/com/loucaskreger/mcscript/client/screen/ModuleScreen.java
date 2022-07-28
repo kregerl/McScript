@@ -5,9 +5,7 @@ import com.loucaskreger.mcscript.util.LuaModule;
 import com.loucaskreger.mcscript.util.ModuleManager;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.WorldSelectionList;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
@@ -125,15 +123,15 @@ public class ModuleScreen extends Screen {
                 this.mc.getTextureManager().bind(new ResourceLocation("textures/gui/world_selection.png"));
                 // Light grey square
 //                AbstractGui.fill(matrixStack, xPos, yPos, xPos + 32, yPos + 32, -1601138544);
-                drawString(matrixStack, ModuleScreen.this.font, this.module.getDisplayName(), xPos, yPos, 16777215);
+                drawString(matrixStack, ModuleScreen.this.font, this.module.getDisplayName(), xPos + 32, yPos, 16777215);
                 matrixStack.pushPose();
                 final float FONT_SCALE_FACTOR = 0.5f;
                 matrixStack.scale(FONT_SCALE_FACTOR, FONT_SCALE_FACTOR, 0.f);
                 final float INVERSE_FONT_SCALE_FACTOR = 1 / FONT_SCALE_FACTOR;
                 final int AUTHOR_OFFSET = 10;
-                drawString(matrixStack, ModuleScreen.this.font, String.format("By: %s", this.module.getAuthor()), (int) (INVERSE_FONT_SCALE_FACTOR * xPos), (int) (INVERSE_FONT_SCALE_FACTOR * (yPos + AUTHOR_OFFSET)), 8421504);
+                drawString(matrixStack, ModuleScreen.this.font, String.format("By: %s", this.module.getAuthor()), (int) (INVERSE_FONT_SCALE_FACTOR * (xPos + 32)), (int) (INVERSE_FONT_SCALE_FACTOR * (yPos + AUTHOR_OFFSET)), 8421504);
                 final int VERSION_OFFSET = AUTHOR_OFFSET + 6;
-                drawString(matrixStack, ModuleScreen.this.font, String.format("Version: %s", this.module.getVersion()), (int) (INVERSE_FONT_SCALE_FACTOR * xPos), (int) (INVERSE_FONT_SCALE_FACTOR * (yPos + VERSION_OFFSET)), 8421504);
+                drawString(matrixStack, ModuleScreen.this.font, String.format("Version: %s", this.module.getVersion()), (int) (INVERSE_FONT_SCALE_FACTOR * (xPos + 32)), (int) (INVERSE_FONT_SCALE_FACTOR * (yPos + VERSION_OFFSET)), 8421504);
                 matrixStack.popPose();
             }
 

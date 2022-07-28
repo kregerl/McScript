@@ -37,7 +37,7 @@ public class McScript {
         manager.loadScripts();
         manager.setGlobalsEntry("Logger", new LuaLogger());
         manager.setGlobalsEntry("Registry", Registry::new);
-        manager.setGlobalsEntry("EventHandler", script -> new EventHandler(script.getName()));
+        manager.setGlobalsEntry("EventHandler", module -> new EventHandler(module.getName()));
         manager.setGlobalsEntry("EventType", LuaUtils.tableFromEnum(EventType.class));
         manager.setGlobalsEntry("Phase", LuaUtils.tableFromEnum(TickEvent.Phase.class));
         manager.setGlobalsEntry("Player", new Player());

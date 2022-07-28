@@ -1,6 +1,7 @@
 package com.loucaskreger.mcscript.util;
 
 import com.loucaskreger.mcscript.McScript;
+import com.loucaskreger.mcscript.api.lua.client.event.EventHandler;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
@@ -17,6 +18,8 @@ public class LuaModule {
     private String author;
     private String version;
     private LuaValue chunk;
+    // TODO: Implement status for displaying the correct icons on module screen.
+    private ModuleStatus status;
     private boolean error;
 
 
@@ -36,10 +39,6 @@ public class LuaModule {
     }
 
     public void call() {
-        McScript.LOGGER.info(this.getDisplayName());
-        McScript.LOGGER.info(this.getAuthor());
-        McScript.LOGGER.info(this.getDescription());
-        McScript.LOGGER.info(this.getVersion());
         this.chunk.call();
     }
 

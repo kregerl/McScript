@@ -74,8 +74,10 @@ public class LuaUtils {
 
     public static abstract class LuaConsumer<T extends LuaValue> extends OneArgFunction {
         protected Consumer<T> consumer;
+        protected final String name;
 
-        public LuaConsumer(Consumer<T> consumer) {
+        public LuaConsumer(String name, Consumer<T> consumer) {
+            this.name = name;
             this.consumer = consumer;
         }
     }

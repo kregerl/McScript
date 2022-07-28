@@ -37,8 +37,8 @@ public class ModuleManager {
     }
 
     public void setGlobalsEntry(String key, Function<LuaModule, LuaValue> func) {
-        for (LuaModule script : this.modules.values()) {
-            this.setGlobalsEntry(key, func.apply(script));
+        for (LuaModule module : this.modules.values()) {
+            module.setGlobalsEntry(key, func.apply(module));
         }
     }
 
@@ -67,7 +67,9 @@ public class ModuleManager {
             McScript.LOGGER.error("Could not find the scripts path, maybe the folder doesn't exist?");
         } else {
             for (File file : files) {
-                this.modules.put(file.getName(), new LuaModule(file));
+                if (file.getName().contains(".lua")) {
+                    this.modules.put(file.getName(), new LuaModule(file));
+                }
             }
         }
         McScript.LOGGER.info(String.format("Loaded %d modules", this.modules.size()));

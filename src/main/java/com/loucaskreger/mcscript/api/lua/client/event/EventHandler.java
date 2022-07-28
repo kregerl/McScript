@@ -14,11 +14,8 @@ import java.util.Optional;
 
 public class EventHandler extends LuaTable {
 
-    // TODO: Make this logger point to a different file, maybe .minecraft/lua/logs
-    private static final Logger LOGGER = LogManager.getLogger("test");
-    // TODO: event listeners should also be split by script, make another map holding a str of the script name
-    public static Map<EventType, LuaFunction> listeners;
-    private String moduleName;
+    public static Map<String, Map<EventType, LuaFunction>> listeners;
+    private final String moduleName;
 
     public EventHandler(String moduleName) {
         super();
@@ -39,24 +36,24 @@ public class EventHandler extends LuaTable {
 //        }
     }
 
-    private static Optional<LuaFunction> getListener(EventType key) {
-        return Optional.ofNullable(listeners.get(key));
+    private static Optional<LuaFunction> getListener(String moduleName, EventType key) {
+        return Optional.ofNullable(listeners.get(moduleName).get(key));
     }
 
     public static void dispatch(EventType key, Event event) {
-        Optional<LuaFunction> callback = getListener(key);
-        try {
-            callback.ifPresent(listener -> listener.call(CoerceJavaToLua.coerce(event)));
-        } catch (LuaError e) {
-            McScript.LUA_LOGGER.error("Error dispatching event");
+        for (String moduleName : listeners.keySet()) {
+            Optional<LuaFunction> callback = getListener(moduleName, key);
+            try {
+                callback.ifPresent(listener -> listener.call(CoerceJavaToLua.coerce(event)));
+            } catch (LuaError e) {
+                McScript.LUA_LOGGER.error("Error dispatching event");
+            }
         }
     }
 
     class addEventListener extends TwoArgFunction {
-
         @Override
         public LuaValue call(LuaValue name, LuaValue listener) {
-            McScript.LOGGER.info("Module name: " + EventHandler.this.moduleName);
             if (!(name instanceof LuaString)) {
                 throw new LuaError("The first argument is not a string! Expected an event type");
             }
@@ -65,9 +62,9 @@ public class EventHandler extends LuaTable {
             }
             Optional<EventType> eventType = EventType.eventFromName(name.tojstring());
             if (eventType.isPresent()) {
-                listeners.put(eventType.get(), (LuaFunction) listener);
+                listeners.computeIfAbsent(EventHandler.this.moduleName, k -> new HashMap<>());
+                listeners.get(EventHandler.this.moduleName).put(eventType.get(), (LuaFunction) listener);
             } else {
-                McScript.LOGGER.info(String.format("Event type `%s` is not a valid event type", name.tojstring()));
                 throw new LuaError(String.format("Event type `%s` is not a valid event type", name.tojstring()));
             }
             return LuaValue.NIL;
