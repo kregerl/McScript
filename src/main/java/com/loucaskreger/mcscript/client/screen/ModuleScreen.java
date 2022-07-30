@@ -3,7 +3,9 @@ package com.loucaskreger.mcscript.client.screen;
 import com.loucaskreger.mcscript.McScript;
 import com.loucaskreger.mcscript.util.LuaModule;
 import com.loucaskreger.mcscript.util.ModuleManager;
+import com.loucaskreger.mcscript.util.ModuleStatus;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.list.ExtendedList;
@@ -19,7 +21,10 @@ import javax.annotation.Nullable;
 
 @SuppressWarnings("deprecation")
 public class ModuleScreen extends Screen {
+    // TODO: Add a search bar to the list.
 
+    private static final int ROW_WIDTH = 220;
+    private static final int HEADER_HEIGHT = 30;
     private static final ResourceLocation BACKGROUND = new ResourceLocation(McScript.MOD_ID, "textures/gui/background.png");
     private final Screen previousScreen;
     private ModuleScreenList list;
@@ -52,14 +57,43 @@ public class ModuleScreen extends Screen {
     @Override
     public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         super.render(matrixStack, mouseX, mouseY, partialTicks);
+        matrixStack.pushPose();
+        renderBackground();
+        matrixStack.popPose();
         this.list.render(matrixStack, mouseX, mouseY, partialTicks);
     }
+
+    private void renderBackground() {
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder builder = tessellator.getBuilder();
+        this.minecraft.getTextureManager().bind(BACKGROUND);
+        builder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+
+        int x0 = Math.max(this.width / 3, ROW_WIDTH);
+
+        addVertex(builder, new Vector3d(x0, HEADER_HEIGHT, 0.0d), 255);
+        addVertex(builder, new Vector3d(this.width, HEADER_HEIGHT, 0.0d), 255);
+        addVertex(builder, new Vector3d(this.width, 0, 0.0d), 255);
+        addVertex(builder, new Vector3d(x0, 0, 0.0d), 255);
+
+        addVertex(builder, new Vector3d(x0, this.height, 0.0d), 191);
+        addVertex(builder, new Vector3d(this.width, this.height, 0.0d), 191);
+        addVertex(builder, new Vector3d(this.width, HEADER_HEIGHT, 0.0d), 191);
+        addVertex(builder, new Vector3d(x0, HEADER_HEIGHT, 0.0d), 191);
+
+        tessellator.end();
+    }
+
+    private void addVertex(BufferBuilder builder, Vector3d vertex, int alpha) {
+        builder.vertex(vertex.x, vertex.y, vertex.z).uv((float) vertex.x / 32.0F, (float) (vertex.y / 32.0F)).color(32, 32, 32, alpha).endVertex();
+    }
+
 
     // (mc, width, height, y0, y1,itemHeight)
     class ModuleScreenList extends ExtendedList<ModuleScreenList.Entry> {
 
         public ModuleScreenList(Minecraft minecraft) {
-            super(minecraft, ModuleScreen.this.width, ModuleScreen.this.height, 30, ModuleScreen.this.height, 36);
+            super(minecraft, Math.max(ModuleScreen.this.width / 3, ROW_WIDTH), ModuleScreen.this.height, HEADER_HEIGHT, ModuleScreen.this.height, 36);
             this.setRenderBackground(false);
             this.setRenderTopAndBottom(false);
             this.setRenderHeader(true, this.y0);
@@ -104,9 +138,8 @@ public class ModuleScreen extends Screen {
         }
 
         private void addVertex(BufferBuilder builder, Vector3d vertex, int alpha) {
-            builder.vertex(vertex.x, vertex.y, vertex.z).uv((float) vertex.x / 32.0F, (float) (vertex.x + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
+            builder.vertex(vertex.x, vertex.y, vertex.z).uv((float) vertex.x / 32.0F, (float) (vertex.y + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
         }
-
 
         class Entry extends ExtendedList.AbstractListEntry<ModuleScreen.ModuleScreenList.Entry> {
 
@@ -120,9 +153,13 @@ public class ModuleScreen extends Screen {
 
             @Override
             public void render(@Nonnull MatrixStack matrixStack, int entryIndex, int yPos, int xPos, int p_230432_5_, int mouseX, int mouseY, int p_230432_8_, boolean p_230432_9_, float partialTicks) {
-                this.mc.getTextureManager().bind(new ResourceLocation("textures/gui/world_selection.png"));
-                // Light grey square
-//                AbstractGui.fill(matrixStack, xPos, yPos, xPos + 32, yPos + 32, -1601138544);
+                this.mc.getTextureManager().bind(ModuleStatus.MODULE_STATUS_ICONS);
+                RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+                RenderSystem.enableBlend();
+                blit(matrixStack, xPos, yPos, 0, this.module.getStatus().getTextureYPos(), 32, 32);
+                RenderSystem.disableBlend();
+
                 drawString(matrixStack, ModuleScreen.this.font, this.module.getDisplayName(), xPos + 32, yPos, 16777215);
                 matrixStack.pushPose();
                 final float FONT_SCALE_FACTOR = 0.5f;
@@ -134,6 +171,7 @@ public class ModuleScreen extends Screen {
                 drawString(matrixStack, ModuleScreen.this.font, String.format("Version: %s", this.module.getVersion()), (int) (INVERSE_FONT_SCALE_FACTOR * (xPos + 32)), (int) (INVERSE_FONT_SCALE_FACTOR * (yPos + VERSION_OFFSET)), 8421504);
                 matrixStack.popPose();
             }
+
 
             @Override
             public boolean mouseClicked(double p_231044_1_, double p_231044_3_, int p_231044_5_) {

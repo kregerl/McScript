@@ -1,7 +1,5 @@
 package com.loucaskreger.mcscript.util;
 
-import com.loucaskreger.mcscript.McScript;
-import com.loucaskreger.mcscript.api.lua.client.event.EventHandler;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
@@ -28,6 +26,7 @@ public class LuaModule {
         this.path = file.getPath();
         this.name = file.getName();
         this.chunk = this.globals.loadfile(this.path);
+        this.status = ModuleStatus.ACTIVE;
     }
 
     public String getName() {
@@ -86,5 +85,13 @@ public class LuaModule {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public ModuleStatus getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(ModuleStatus status) {
+        this.status = status;
     }
 }
