@@ -27,6 +27,9 @@ public class LuaUtils {
         return LuaTable.tableOf(values.toArray(new LuaValue[0]));
     }
 
+    // TODO: Add a function to get the enum value from a enum.class and string that matches it.
+
+
     public static <T> Optional<T> tryConvert(LuaValue arg) {
         try {
             return Optional.of((T) arg);

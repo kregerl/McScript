@@ -5,8 +5,8 @@ import net.minecraft.util.ResourceLocation;
 
 public enum ModuleStatus {
     ACTIVE,
-    DISABLED,
-    ERROR;
+    ERROR,
+    DISABLED;
 
     public static final ResourceLocation MODULE_STATUS_ICONS = new ResourceLocation(McScript.MOD_ID, "textures/gui/module_status.png");
 

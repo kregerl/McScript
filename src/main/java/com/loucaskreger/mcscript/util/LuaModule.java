@@ -18,7 +18,6 @@ public class LuaModule {
     private LuaValue chunk;
     // TODO: Implement status for displaying the correct icons on module screen.
     private ModuleStatus status;
-    private boolean error;
 
 
     public LuaModule(File file) {
@@ -41,17 +40,10 @@ public class LuaModule {
         this.chunk.call();
     }
 
-    public void setError(boolean error) {
-        this.error = error;
-    }
-
-    public boolean isError() {
-        return this.error;
-    }
 
     public void reloadModule() {
         this.chunk = this.globals.loadfile(this.path);
-        this.error = false;
+        this.status = ModuleStatus.ACTIVE;
         this.call();
     }
 

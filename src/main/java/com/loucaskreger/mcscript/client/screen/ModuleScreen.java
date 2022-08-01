@@ -7,7 +7,9 @@ import com.loucaskreger.mcscript.util.ModuleStatus;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.WorldSelectionList;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
@@ -137,6 +139,8 @@ public class ModuleScreen extends Screen {
             tessellator.end();
         }
 
+
+
         private void addVertex(BufferBuilder builder, Vector3d vertex, int alpha) {
             builder.vertex(vertex.x, vertex.y, vertex.z).uv((float) vertex.x / 32.0F, (float) (vertex.y + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
         }
@@ -155,6 +159,7 @@ public class ModuleScreen extends Screen {
             public void render(@Nonnull MatrixStack matrixStack, int entryIndex, int yPos, int xPos, int p_230432_5_, int mouseX, int mouseY, int p_230432_8_, boolean p_230432_9_, float partialTicks) {
                 this.mc.getTextureManager().bind(ModuleStatus.MODULE_STATUS_ICONS);
                 RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+                fill(matrixStack, 250,62, 250 + 32, 62 + 32, -1601138544);
 
                 RenderSystem.enableBlend();
                 blit(matrixStack, xPos, yPos, 0, this.module.getStatus().getTextureYPos(), 32, 32);

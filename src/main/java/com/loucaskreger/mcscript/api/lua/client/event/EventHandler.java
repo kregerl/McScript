@@ -1,9 +1,10 @@
 package com.loucaskreger.mcscript.api.lua.client.event;
 
 import com.loucaskreger.mcscript.McScript;
+import com.loucaskreger.mcscript.util.LuaModule;
+import com.loucaskreger.mcscript.util.ModuleManager;
+import com.loucaskreger.mcscript.util.ModuleStatus;
 import net.minecraftforge.eventbus.api.Event;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.luaj.vm2.*;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
@@ -41,12 +42,19 @@ public class EventHandler extends LuaTable {
     }
 
     public static void dispatch(EventType key, Event event) {
+
         for (String moduleName : listeners.keySet()) {
+            Optional<LuaModule> module = ModuleManager.getInstance().getModule(moduleName);
             Optional<LuaFunction> callback = getListener(moduleName, key);
-            try {
-                callback.ifPresent(listener -> listener.call(CoerceJavaToLua.coerce(event)));
-            } catch (LuaError e) {
-                McScript.LUA_LOGGER.error("Error dispatching event");
+            if (module.isPresent()) {
+                LuaModule mod = module.get();
+                try {
+                    callback.ifPresent(listener -> listener.call(CoerceJavaToLua.coerce(event)));
+                } catch (LuaError e) {
+                    mod.setStatus(ModuleStatus.ERROR);
+                }
+            } else {
+                McScript.LOGGER.info("Trying call event callback for a module that doesn't exist: " + moduleName);
             }
         }
     }

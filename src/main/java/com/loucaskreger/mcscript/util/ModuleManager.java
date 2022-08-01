@@ -50,8 +50,8 @@ public class ModuleManager {
             try {
                 module.call();
             } catch (LuaError e) {
-                McScript.LUA_LOGGER.error("Caught lua error in file " +  entry.getKey() + ": " + e.getLocalizedMessage());
-                module.setError(true);
+                McScript.LUA_LOGGER.error("Caught lua error in file " + entry.getKey() + ": " + e.getLocalizedMessage());
+                module.setStatus(ModuleStatus.ERROR);
             }
         }
     }
